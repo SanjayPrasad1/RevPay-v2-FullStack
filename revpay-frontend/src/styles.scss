@@ -1,1 +1,56 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$orange-palette,
+  ),
+  density: (scale: 0),
+));
+
+html {
+  @include mat.all-component-themes($theme);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: Roboto, sans-serif; }
+
+.page-container { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  mat-card-content { display: flex; align-items: center; gap: 16px; }
+  .stat-icon { font-size: 40px; width: 40px; height: 40px; color: #3f51b5; }
+  .stat-value { font-size: 24px; font-weight: 500; }
+  .stat-label { color: rgba(0,0,0,.54); font-size: 14px; }
+}
+
+.success-snack { background: #4caf50; color: white; }
+.error-snack { background: #f44336; color: white; }
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  &.PENDING { background: #fff3cd; color: #856404; }
+  &.COMPLETED, &.PAID, &.ACTIVE, &.APPROVED { background: #d4edda; color: #155724; }
+  &.FAILED, &.REJECTED, &.CANCELLED { background: #f8d7da; color: #721c24; }
+  &.SENT { background: #cce5ff; color: #004085; }
+  &.DRAFT { background: #e2e3e5; color: #383d41; }
+  &.OVERDUE { background: #f8d7da; color: #721c24; }
+}
+
+.full-width { width: 100%; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.flex-row { display: flex; align-items: center; }
+.spacer { flex: 1 1 auto; }
