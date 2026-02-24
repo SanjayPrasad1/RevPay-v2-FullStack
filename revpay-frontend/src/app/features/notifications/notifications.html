@@ -1,1 +1,36 @@
-<p>notifications works!</p>
+ <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link active" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <div class="sidebar-footer">
+          <a class="nav-link" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button class="nav-link btn-reset" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="page-container">
+          <div class="flex-row mb-24">
+            <h2 style="margin:0">Notifications</h2>
+            <span class="spacer"></span>
+            <button mat-stroked-button (click)="markAllRead()">Mark All Read</button>
+          </div>
+          <div *ngIf="loading" style="text-align:center;padding:40px"><mat-spinner diameter="40"></mat-spinner></div>
+          <div *ngFor="let n of notifications" class="notification-card" [class.unread]="!n.isRead" (click)="markRead(n)">
+            <div class="notif-icon">
+              <span class="material-icons" [style.color]="getColor(n.type)">{{ getIcon(n.type) }}</span>
+            </div>
+            <div class="notif-content">
+              <div class="notif-title">{{ n.title }}</div>
+              <div class="notif-message">{{ n.message }}</div>
+              <div class="notif-date">{{ n.createdAt | date:'short' }}</div>
+            </div>
+            <div class="notif-dot" *ngIf="!n.isRead"></div>
+          </div>
+          <p *ngIf="!notifications.length && !loading" class="no-data">No notifications</p>
+        </div>
+      </main>
+    </div>

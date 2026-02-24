@@ -1,1 +1,73 @@
-<p>register works!</p>
+<div class="auth-container">
+      <mat-card class="auth-card">
+        <mat-card-header>
+          <mat-card-title>
+            <h1 class="brand">RevPay</h1>
+            <p class="subtitle">Create your account</p>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Account Type</mat-label>
+              <mat-select formControlName="accountType">
+                <mat-option value="PERSONAL">Personal</mat-option>
+                <mat-option value="BUSINESS">Business</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Full Name</mat-label>
+              <input matInput formControlName="fullName">
+              <mat-error *ngIf="form.get('fullName')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username">
+              <mat-error *ngIf="form.get('username')?.hasError('required')">Required</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" type="email">
+              <mat-error *ngIf="form.get('email')?.hasError('required')">Required</mat-error>
+              <mat-error *ngIf="form.get('email')?.hasError('email')">Invalid email</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Phone Number</mat-label>
+              <input matInput formControlName="phoneNumber">
+            </mat-form-field>
+            <mat-form-field class="full-width mb-16">
+              <mat-label>Password</mat-label>
+              <input matInput formControlName="password" type="password">
+              <mat-error *ngIf="form.get('password')?.hasError('required')">Required</mat-error>
+              <mat-error *ngIf="form.get('password')?.hasError('minlength')">Min 8 characters</mat-error>
+            </mat-form-field>
+
+            <ng-container *ngIf="form.get('accountType')?.value === 'BUSINESS'">
+              <mat-form-field class="full-width mb-16">
+                <mat-label>Business Name</mat-label>
+                <input matInput formControlName="businessName">
+              </mat-form-field>
+              <mat-form-field class="full-width mb-16">
+                <mat-label>Business Type</mat-label>
+                <input matInput formControlName="businessType">
+              </mat-form-field>
+              <mat-form-field class="full-width mb-16">
+                <mat-label>Tax ID</mat-label>
+                <input matInput formControlName="taxId">
+              </mat-form-field>
+              <mat-form-field class="full-width mb-16">
+                <mat-label>Business Address</mat-label>
+                <input matInput formControlName="businessAddress">
+              </mat-form-field>
+            </ng-container>
+
+            <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="loading">
+              {{ loading ? 'Creating account...' : 'Create Account' }}
+            </button>
+          </form>
+        </mat-card-content>
+        <mat-card-actions>
+          <p class="login-link">Already have an account? <a routerLink="/auth/login">Sign in</a></p>
+        </mat-card-actions>
+      </mat-card>
+    </div>

@@ -1,1 +1,85 @@
-<p>loans works!</p>
+ <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <div class="nav-section">Business</div>
+        <a class="nav-link" routerLink="/invoices"><span class="material-icons">receipt</span> Invoices</a>
+        <a class="nav-link active" routerLink="/loans"><span class="material-icons">account_balance</span> Loans</a>
+        <div class="sidebar-footer">
+          <a class="nav-link" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button class="nav-link btn-reset" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="page-container">
+          <h2>Business Loans</h2>
+          <mat-tab-group>
+            <mat-tab label="My Loans">
+              <div class="mt-16 card-grid">
+                <mat-card *ngFor="let loan of loans">
+                  <mat-card-header>
+                    <mat-card-title>{{ loan.loanNumber }}</mat-card-title>
+                    <mat-card-subtitle><span class="status-badge {{ loan.status }}">{{ loan.status }}</span></mat-card-subtitle>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <p><strong>Amount:</strong> {{ (loan.approvedAmount || loan.requestedAmount) | currency }}</p>
+                    <p><strong>Purpose:</strong> {{ loan.purpose }}</p>
+                    <p><strong>Tenure:</strong> {{ loan.tenure }} months</p>
+                    <p *ngIf="loan.emi"><strong>EMI:</strong> {{ loan.emi | currency }}</p>
+                    <p *ngIf="loan.interestRate"><strong>Interest Rate:</strong> {{ loan.interestRate }}% p.a.</p>
+                    <div *ngIf="loan.status === 'ACTIVE'">
+                      <p><strong>Repaid:</strong> {{ loan.repaidAmount | currency }}</p>
+                      <mat-progress-bar mode="determinate" [value]="getProgress(loan)"></mat-progress-bar>
+                    </div>
+                    <p><strong>Applied:</strong> {{ loan.createdAt | date:'short' }}</p>
+                  </mat-card-content>
+                  <mat-card-actions *ngIf="loan.status === 'ACTIVE'">
+                    <button mat-raised-button color="primary" (click)="repay(loan)">Make Repayment</button>
+                  </mat-card-actions>
+                </mat-card>
+                <mat-card *ngIf="!loans.length" style="text-align:center;padding:40px">
+                  <p>No loan applications yet</p>
+                </mat-card>
+              </div>
+            </mat-tab>
+            <mat-tab label="Apply for Loan">
+              <mat-card class="mt-16">
+                <mat-card-header><mat-card-title>Loan Application</mat-card-title></mat-card-header>
+                <mat-card-content>
+                  <form [formGroup]="loanForm" (ngSubmit)="applyForLoan()">
+                    <div class="form-grid">
+                      <mat-form-field>
+                        <mat-label>Loan Amount</mat-label>
+                        <input matInput type="number" formControlName="requestedAmount">
+                        <mat-error>Minimum $1000</mat-error>
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Tenure (months)</mat-label>
+                        <input matInput type="number" formControlName="tenure">
+                      </mat-form-field>
+                      <mat-form-field style="grid-column: 1/-1">
+                        <mat-label>Loan Purpose</mat-label>
+                        <input matInput formControlName="purpose">
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Annual Business Revenue</mat-label>
+                        <input matInput formControlName="businessRevenue">
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Business Description</mat-label>
+                        <input matInput formControlName="businessDescription">
+                      </mat-form-field>
+                    </div>
+                    <button mat-raised-button color="primary" type="submit" [disabled]="loanForm.invalid">Submit Application</button>
+                  </form>
+                </mat-card-content>
+              </mat-card>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </main>
+    </div>

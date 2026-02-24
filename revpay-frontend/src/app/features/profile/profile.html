@@ -1,1 +1,76 @@
-<p>profile works!</p>
+ <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <div class="sidebar-footer">
+          <a class="nav-link active" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button class="nav-link btn-reset" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="page-container">
+          <h2>Profile Settings</h2>
+          <mat-tab-group>
+            <mat-tab label="Profile">
+              <mat-card class="mt-16">
+                <mat-card-content>
+                  <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+                    <div class="form-grid">
+                      <mat-form-field>
+                        <mat-label>Full Name</mat-label>
+                        <input matInput formControlName="fullName">
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Phone Number</mat-label>
+                        <input matInput formControlName="phoneNumber">
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Email (readonly)</mat-label>
+                        <input matInput [value]="profile?.email" readonly>
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>Username (readonly)</mat-label>
+                        <input matInput [value]="profile?.username" readonly>
+                      </mat-form-field>
+                    </div>
+                    <button mat-raised-button color="primary" type="submit">Save Profile</button>
+                  </form>
+                </mat-card-content>
+              </mat-card>
+            </mat-tab>
+            <mat-tab label="Security">
+              <mat-card class="mt-16">
+                <mat-card-header><mat-card-title>Change Password</mat-card-title></mat-card-header>
+                <mat-card-content>
+                  <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                    <mat-form-field class="full-width mb-16">
+                      <mat-label>Current Password</mat-label>
+                      <input matInput type="password" formControlName="currentPassword">
+                    </mat-form-field>
+                    <mat-form-field class="full-width mb-16">
+                      <mat-label>New Password</mat-label>
+                      <input matInput type="password" formControlName="newPassword">
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" type="submit">Change Password</button>
+                  </form>
+                </mat-card-content>
+              </mat-card>
+              <mat-card class="mt-16">
+                <mat-card-header><mat-card-title>Transaction PIN</mat-card-title></mat-card-header>
+                <mat-card-content>
+                  <mat-form-field class="full-width mb-16">
+                    <mat-label>New PIN (4-6 digits)</mat-label>
+                    <input matInput type="password" [(ngModel)]="newPin" maxlength="6">
+                  </mat-form-field>
+                  <button mat-raised-button color="primary" (click)="setPin()">Set PIN</button>
+                </mat-card-content>
+              </mat-card>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </main>
+    </div>

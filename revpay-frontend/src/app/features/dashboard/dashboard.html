@@ -1,1 +1,148 @@
-<p>dashboard works!</p>
+<div class="layout">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link active" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <ng-container *ngIf="isBusiness">
+          <div class="nav-section">Business</div>
+          <a class="nav-link" routerLink="/invoices"><span class="material-icons">receipt</span> Invoices</a>
+          <a class="nav-link" routerLink="/loans"><span class="material-icons">account_balance</span> Loans</a>
+        </ng-container>
+        <div class="sidebar-footer">
+          <a class="nav-link" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button mat-button class="nav-link logout" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+
+      <!-- Main content -->
+      <main class="main-content">
+        <div class="page-container" *ngIf="!loading; else spinner">
+          <h2>Welcome back, {{ user?.fullName }}! 👋</h2>
+
+          <div class="card-grid">
+            <mat-card class="stat-card">
+              <mat-card-content>
+                <span class="material-icons stat-icon" style="color: #3f51b5">account_balance_wallet</span>
+                <div>
+                  <div class="stat-value">{{ dashboard?.walletBalance | currency }}</div>
+                  <div class="stat-label">Wallet Balance</div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+            <mat-card class="stat-card">
+              <mat-card-content>
+                <span class="material-icons stat-icon" style="color: #f44336">pending_actions</span>
+                <div>
+                  <div class="stat-value">{{ dashboard?.pendingRequests }}</div>
+                  <div class="stat-label">Pending Requests</div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+            <mat-card class="stat-card">
+              <mat-card-content>
+                <span class="material-icons stat-icon" style="color: #ff9800">notifications</span>
+                <div>
+                  <div class="stat-value">{{ dashboard?.unreadNotifications }}</div>
+                  <div class="stat-label">Unread Notifications</div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+            <ng-container *ngIf="isBusiness">
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <span class="material-icons stat-icon" style="color: #4caf50">trending_up</span>
+                  <div>
+                    <div class="stat-value">{{ dashboard?.totalReceived | currency }}</div>
+                    <div class="stat-label">Received (Month)</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+              <mat-card class="stat-card">
+                <mat-card-content>
+                  <span class="material-icons stat-icon" style="color: #e91e63">receipt</span>
+                  <div>
+                    <div class="stat-value">{{ dashboard?.pendingInvoicesAmount | currency }}</div>
+                    <div class="stat-label">Outstanding Invoices</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </ng-container>
+          </div>
+
+          <!-- Quick Actions -->
+          <mat-card class="mb-24">
+            <mat-card-header><mat-card-title>Quick Actions</mat-card-title></mat-card-header>
+            <mat-card-content>
+              <div class="quick-actions">
+                <button mat-raised-button color="primary" (click)="openSendMoney()">
+                  <span class="material-icons">send</span> Send Money
+                </button>
+                <button mat-raised-button color="accent" (click)="openRequestMoney()">
+                  <span class="material-icons">request_page</span> Request Money
+                </button>
+                <button mat-raised-button (click)="openAddFunds()">
+                  <span class="material-icons">add</span> Add Funds
+                </button>
+                <button mat-stroked-button (click)="openWithdraw()">
+                  <span class="material-icons">arrow_downward</span> Withdraw
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Recent Transactions -->
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Recent Transactions</mat-card-title>
+              <span class="spacer"></span>
+              <a mat-button routerLink="/transactions">View All</a>
+            </mat-card-header>
+            <mat-card-content>
+              <div *ngFor="let tx of dashboard?.recentTransactions" class="tx-item">
+                <span class="material-icons tx-icon" [style.color]="tx.type === 'RECEIVE' ? '#4caf50' : '#f44336'">
+                  {{ tx.type === 'RECEIVE' || tx.type === 'ADD_FUNDS' ? 'arrow_downward' : 'arrow_upward' }}
+                </span>
+                <div class="tx-details">
+                  <div class="tx-name">{{ tx.senderName || tx.receiverName }}</div>
+                  <div class="tx-date">{{ tx.createdAt | date:'short' }}</div>
+                </div>
+                <div class="tx-amount" [style.color]="tx.type === 'RECEIVE' || tx.type === 'ADD_FUNDS' ? '#4caf50' : '#f44336'">
+                  {{ (tx.type === 'RECEIVE' || tx.type === 'ADD_FUNDS' ? '+' : '-') }}{{ tx.amount | currency }}
+                </div>
+              </div>
+              <p *ngIf="!dashboard?.recentTransactions?.length" class="no-data">No recent transactions</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <ng-template #spinner><div class="loading"><mat-spinner></mat-spinner></div></ng-template>
+      </main>
+    </div>
+
+    <!-- Send Money Dialog -->
+    <ng-template #sendDialog let-dialogRef="dialogRef">
+      <form [formGroup]="sendForm" (ngSubmit)="submitSend()">
+        <h2 mat-dialog-title>Send Money</h2>
+        <mat-dialog-content>
+          <mat-form-field class="full-width mb-16">
+            <mat-label>Recipient (email/username/phone)</mat-label>
+            <input matInput formControlName="recipientIdentifier">
+          </mat-form-field>
+          <mat-form-field class="full-width mb-16">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="amount">
+          </mat-form-field>
+          <mat-form-field class="full-width mb-16">
+            <mat-label>Note (optional)</mat-label>
+            <input matInput formControlName="note">
+          </mat-form-field>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+          <button mat-button mat-dialog-close>Cancel</button>
+          <button mat-raised-button color="primary" type="submit">Send</button>
+        </mat-dialog-actions>
+      </form>
+    </ng-template>

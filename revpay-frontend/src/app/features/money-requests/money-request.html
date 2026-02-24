@@ -1,0 +1,75 @@
+ <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link active" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <div class="sidebar-footer">
+          <a class="nav-link" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button class="nav-link btn-reset" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="page-container">
+          <h2>Money Requests</h2>
+
+          <!-- New Request Form -->
+          <mat-card class="mb-24">
+            <mat-card-header><mat-card-title>New Request</mat-card-title></mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="requestForm" (ngSubmit)="createRequest()" class="form-row">
+                <mat-form-field>
+                  <mat-label>Recipient (email/username/phone)</mat-label>
+                  <input matInput formControlName="recipientIdentifier">
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Amount</mat-label>
+                  <input matInput type="number" formControlName="amount">
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Purpose</mat-label>
+                  <input matInput formControlName="purpose">
+                </mat-form-field>
+                <button mat-raised-button color="primary" type="submit" [disabled]="requestForm.invalid">Send Request</button>
+              </form>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-tab-group>
+            <mat-tab label="Incoming ({{ incoming.length }})">
+              <div class="tab-content">
+                <div *ngFor="let r of incoming" class="request-card">
+                  <div class="request-info">
+                    <strong>{{ r.requesterName }}</strong> requests <strong>{{ r.amount | currency }}</strong>
+                    <div class="request-meta">{{ r.purpose || 'No purpose specified' }} · {{ r.createdAt | date:'short' }}</div>
+                  </div>
+                  <div class="request-actions" *ngIf="r.status === 'PENDING'">
+                    <button mat-raised-button color="primary" (click)="accept(r.id)">Accept</button>&nbsp;
+                    <button mat-raised-button color="warn" (click)="decline(r.id)">Decline</button>
+                  </div>
+                  <span class="status-badge {{ r.status }}" *ngIf="r.status !== 'PENDING'">{{ r.status }}</span>
+                </div>
+                <p *ngIf="!incoming.length" class="no-data">No incoming requests</p>
+              </div>
+            </mat-tab>
+            <mat-tab label="Outgoing ({{ outgoing.length }})">
+              <div class="tab-content">
+                <div *ngFor="let r of outgoing" class="request-card">
+                  <div class="request-info">
+                    <strong>Request to {{ r.recipientName }}</strong> for <strong>{{ r.amount | currency }}</strong>
+                    <div class="request-meta">{{ r.purpose || 'No purpose' }} · {{ r.createdAt | date:'short' }}</div>
+                  </div>
+                  <div>
+                    <button mat-stroked-button color="warn" (click)="cancel(r.id)" *ngIf="r.status === 'PENDING'">Cancel</button>
+                    <span class="status-badge {{ r.status }}" *ngIf="r.status !== 'PENDING'">{{ r.status }}</span>
+                  </div>
+                </div>
+                <p *ngIf="!outgoing.length" class="no-data">No outgoing requests</p>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </main>
+    </div>

@@ -1,0 +1,18 @@
+.layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: #3f51b5; color: white; padding: 16px; display: flex; flex-direction: column; position: fixed; height: 100vh; }
+    .brand { font-size: 1.5rem; font-weight: 700; padding: 8px 0 24px; }
+    .nav-link { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.8); text-decoration: none; padding: 10px 8px; border-radius: 8px; margin-bottom: 4px; cursor: pointer; background: none; border: none; font-size: 14px; width: 100%; }
+    .nav-link:hover, .nav-link.active { background: rgba(255,255,255,.15); color: white; }
+    .sidebar-footer { margin-top: auto; }
+    .btn-reset { background: none; border: none; cursor: pointer; }
+    .main-content { flex: 1; margin-left: 240px; background: #f5f5f5; min-height: 100vh; }
+    .notification-card { display: flex; align-items: flex-start; gap: 12px; background: white; border-radius: 8px; padding: 16px; margin-bottom: 8px; cursor: pointer; position: relative; transition: box-shadow .2s; }
+    .notification-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    .notification-card.unread { background: #f0f4ff; border-left: 3px solid #3f51b5; }
+    .notif-content { flex: 1; }
+    .notif-title { font-weight: 600; }
+    .notif-message { color: rgba(0,0,0,.7); font-size: 14px; }
+    .notif-date { font-size: 12px; color: rgba(0,0,0,.38); margin-top: 4px; }
+    .notif-dot { width: 8px; height: 8px; background: #3f51b5; border-radius: 50%; flex-shrink: 0; }
+    .no-data { text-align: center; color: rgba(0,0,0,.38); padding: 40px; }
+ 

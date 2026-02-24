@@ -1,0 +1,87 @@
+<div class="layout">
+      <nav class="sidebar">
+        <div class="brand">RevPay</div>
+        <a class="nav-link" routerLink="/dashboard"><span class="material-icons">dashboard</span> Dashboard</a>
+        <a class="nav-link" routerLink="/transactions"><span class="material-icons">swap_horiz</span> Transactions</a>
+        <a class="nav-link" routerLink="/money-requests"><span class="material-icons">request_page</span> Money Requests</a>
+        <a class="nav-link active" routerLink="/payment-methods"><span class="material-icons">credit_card</span> Payment Methods</a>
+        <a class="nav-link" routerLink="/notifications"><span class="material-icons">notifications</span> Notifications</a>
+        <div class="sidebar-footer">
+          <a class="nav-link" routerLink="/profile"><span class="material-icons">person</span> Profile</a>
+          <button class="nav-link btn-reset" (click)="logout()"><span class="material-icons">logout</span> Logout</button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <div class="page-container">
+          <h2>Payment Methods</h2>
+          <div class="card-grid">
+            <mat-card *ngFor="let pm of paymentMethods">
+              <mat-card-header>
+                <mat-card-title>{{ pm.cardType }}</mat-card-title>
+                <mat-card-subtitle>{{ pm.maskedCardNumber }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p><strong>Holder:</strong> {{ pm.cardHolderName }}</p>
+                <p><strong>Expires:</strong> {{ pm.expiryMonth }}/{{ pm.expiryYear }}</p>
+                <p *ngIf="pm.isDefault"><span class="status-badge COMPLETED">DEFAULT</span></p>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button (click)="setDefault(pm.id)" *ngIf="!pm.isDefault">Set Default</button>
+                <button mat-button color="warn" (click)="delete(pm.id)">Remove</button>
+              </mat-card-actions>
+            </mat-card>
+            <mat-card *ngIf="!paymentMethods.length" style="grid-column:1/-1;text-align:center;padding:40px">
+              <p>No payment methods added yet.</p>
+            </mat-card>
+          </div>
+
+          <mat-card class="mt-24">
+            <mat-card-header><mat-card-title>Add New Card</mat-card-title></mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="addForm" (ngSubmit)="addCard()">
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Card Holder Name</mat-label>
+                    <input matInput formControlName="cardHolderName">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Card Number (16 digits)</mat-label>
+                    <input matInput formControlName="cardNumber" maxlength="16">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Expiry Month (MM)</mat-label>
+                    <input matInput formControlName="expiryMonth" maxlength="2">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Expiry Year (YY)</mat-label>
+                    <input matInput formControlName="expiryYear" maxlength="4">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>CVV</mat-label>
+                    <input matInput formControlName="cvv" type="password" maxlength="4">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Card Type</mat-label>
+                    <mat-select formControlName="cardType">
+                      <mat-option value="CREDIT">Credit Card</mat-option>
+                      <mat-option value="DEBIT">Debit Card</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Billing Address</mat-label>
+                    <input matInput formControlName="billingAddress">
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-label>Billing Country</mat-label>
+                    <input matInput formControlName="billingCountry">
+                  </mat-form-field>
+                </div>
+                <button mat-raised-button color="primary" type="submit" [disabled]="addForm.invalid || loading">
+                  {{ loading ? 'Adding...' : 'Add Card' }}
+                </button>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </main>
+    </div>
