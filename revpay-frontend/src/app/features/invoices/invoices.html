@@ -38,6 +38,85 @@
                 <p *ngIf="!invoices.length" class="no-data">No invoices yet</p>
               </div>
             </mat-tab>
+            <!-- <mat-tab label="My Invoices">
+                <div class="mt-16">
+                  <div *ngIf="accountType === 'BUSINESS'">
+                    <table mat-table [dataSource]="invoices" class="full-width">
+                      <ng-container matColumnDef="number">
+                        <th mat-header-cell *matHeaderCellDef>Invoice #</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.invoiceNumber}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="customer">
+                        <th mat-header-cell *matHeaderCellDef>Customer</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.customerName}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="amount">
+                        <th mat-header-cell *matHeaderCellDef>Amount</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.totalAmount | currency}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef>Status</th>
+                        <td mat-cell *matCellDef="let inv">
+                          <span class="status-badge" [ngClass]="inv.status.toLowerCase()">{{inv.status}}</span>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="due">
+                        <th mat-header-cell *matHeaderCellDef>Due Date</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.dueDate | date}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <td mat-cell *matCellDef="let inv">
+                          <button mat-icon-button color="primary" *ngIf="inv.status === 'DRAFT'" (click)="sendInvoice(inv.id)" title="Send">
+                            <span class="material-icons">send</span>
+                          </button>
+                          <button mat-icon-button color="accent" *ngIf="inv.status === 'SENT'" (click)="markPaid(inv.id)" title="Mark as Paid">
+                            <span class="material-icons">check_circle</span>
+                          </button>
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="cols"></tr>
+                      <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+                    </table>
+                  </div>
+
+                  <div *ngIf="accountType === 'PERSONAL'">
+                    <table mat-table [dataSource]="receivedInvoices" class="full-width">
+                      <ng-container matColumnDef="number">
+                        <th mat-header-cell *matHeaderCellDef>Invoice #</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.invoiceNumber}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="business">
+                        <th mat-header-cell *matHeaderCellDef>From Business</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.businessName}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="amount">
+                        <th mat-header-cell *matHeaderCellDef>Amount</th>
+                        <td mat-cell *matCellDef="let inv">{{inv.totalAmount | currency}}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef>Status</th>
+                        <td mat-cell *matCellDef="let inv">
+                          <span class="status-badge" [ngClass]="inv.status.toLowerCase()">{{inv.status}}</span>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <td mat-cell *matCellDef="let inv">
+                          <button mat-raised-button color="primary" *ngIf="inv.status === 'SENT'" (click)="pay(inv)">
+                            Pay Now
+                          </button>
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="['number', 'business', 'amount', 'status', 'actions']"></tr>
+                      <tr mat-row *matRowDef="let row; columns: ['number', 'business', 'amount', 'status', 'actions'];"></tr>
+                    </table>
+                    <div *ngIf="receivedInvoices.length === 0" class="empty-state">No invoices received.</div>
+                  </div>
+                </div>
+              </mat-tab> -->
             <mat-tab label="Create Invoice">
               <mat-card class="mt-16">
                 <mat-card-content>

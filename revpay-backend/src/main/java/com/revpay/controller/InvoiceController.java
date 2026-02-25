@@ -6,6 +6,7 @@ import com.revpay.dto.response.InvoiceResponse;
 import com.revpay.enums.InvoiceStatus;
 import com.revpay.security.UserPrincipal;
 import com.revpay.service.InvoiceService;
+import com.revpay.service.impl.InvoiceServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+    private final InvoiceServiceImpl invoiceServiceimpl;
 
     @PostMapping
     public ResponseEntity<ApiResponse<InvoiceResponse>> createInvoice(
@@ -67,5 +69,14 @@ public class InvoiceController {
             @PathVariable Long id) {
         invoiceService.sendInvoice(user.getId(), id);
         return ResponseEntity.ok(ApiResponse.success("Invoice sent", null));
+    }
+
+    @GetMapping("/received")
+    public ResponseEntity<ApiResponse<Page<InvoiceResponse>>> getReceivedInvoices(
+            @AuthenticationPrincipal UserPrincipal user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.success(
+                invoiceServiceimpl.getReceivedInvoices(user.getEmail(), page, size)));
     }
 }

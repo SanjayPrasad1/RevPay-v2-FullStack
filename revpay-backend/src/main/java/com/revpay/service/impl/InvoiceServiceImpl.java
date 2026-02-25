@@ -4,12 +4,14 @@ import com.revpay.dto.request.InvoiceRequest;
 import com.revpay.dto.response.InvoiceResponse;
 import com.revpay.entity.Invoice;
 import com.revpay.entity.InvoiceLineItem;
+import com.revpay.entity.Notification;
 import com.revpay.entity.User;
 import com.revpay.enums.AccountType;
 import com.revpay.enums.InvoiceStatus;
 import com.revpay.enums.NotificationType;
 import com.revpay.exception.BadRequestException;
 import com.revpay.repository.InvoiceRepository;
+import com.revpay.repository.NotificationRepository;
 import com.revpay.repository.UserRepository;
 import com.revpay.service.InvoiceService;
 import com.revpay.service.NotificationService;
@@ -31,6 +33,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional
@@ -129,18 +132,37 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public void sendInvoice(Long userId, Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
-            .orElseThrow(() -> new BadRequestException("Invoice not found"));
+                .orElseThrow(() -> new BadRequestException("Invoice not found"));
         if (!invoice.getBusinessUser().getId().equals(userId)) {
             throw new BadRequestException("Access denied");
         }
         invoice.setStatus(InvoiceStatus.SENT);
         invoiceRepository.save(invoice);
 
-        notificationService.createNotification(invoice.getBusinessUser(), "Invoice Sent",
-            "Invoice " + invoice.getInvoiceNumber() + " sent to " + invoice.getCustomerName(),
-            NotificationType.INVOICE, String.valueOf(invoice.getId()));
+        userRepository.findByEmail(invoice.getCustomerEmail()).ifPresent(customer -> {
+            Notification notification = Notification.builder()
+                    .user(customer) // Link the notification to the found user
+                    .title("New Invoice Received")
+                    .message("You received an invoice of $" + invoice.getTotalAmount() + " from " + invoice.getBusinessUser().getBusinessName())
+                    .type(NotificationType.INVOICE)
+                    .referenceId(invoice.getInvoiceNumber())
+                    .isRead(false)
+                    .build();
+
+            notificationRepository.save(notification);
+        });
+
+//        notificationService.createNotification(invoice.getBusinessUser(), "Invoice Sent",
+//            "Invoice " + invoice.getInvoiceNumber() + " sent to " + invoice.getCustomerName(),
+//            NotificationType.INVOICE, String.valueOf(invoice.getId()));
+    }
+    @Override
+    public Page<InvoiceResponse> getReceivedInvoices(String customerEmail, int page, int size){
+        return invoiceRepository.findByCustomerEmailOrderByCreatedAtDesc(customerEmail, PageRequest.of(page, size))
+                .map(this::mapToResponse);
     }
 
     private InvoiceResponse mapToResponse(Invoice inv) {

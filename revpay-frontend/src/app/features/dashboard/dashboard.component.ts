@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { UserApiService, TransactionApiService } from '../../core/services/api.service';
-
+import { InvoiceApiService } from '../../core/services/api.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -29,10 +29,12 @@ export class DashboardComponent implements OnInit {
   loading = true;
   sendForm: FormGroup;
   isBusiness = false;
+  receivedInvoices: any[] = []
 
   constructor(
     private userApi: UserApiService,
     private txApi: TransactionApiService,
+    private invoiceApi: InvoiceApiService,
     private authService: AuthService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
@@ -49,6 +51,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.userApi.getProfile().subscribe(res => { this.user = res.data; });
     this.userApi.getDashboard().subscribe({ next: res => { this.dashboard = res.data; this.loading = false; }, error: () => this.loading = false });
+    this.invoiceApi.getReceived(0,5).subscribe(res =>{
+      this.receivedInvoices = res.data.content;
+    })
   }
 
   logout(): void { this.authService.logout(); }

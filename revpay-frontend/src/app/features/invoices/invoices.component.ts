@@ -23,9 +23,14 @@ import { AuthService } from '../../core/services/auth.service';
     styleUrl: './invoices.css',
 })
 export class InvoicesComponent implements OnInit {
+accountType: any;
+pay(_t312: any) {
+throw new Error('Method not implemented.');
+}
   invoices: any[] = [];
   cols = ['number', 'customer', 'amount', 'status', 'due', 'actions'];
   invoiceForm: FormGroup;
+  receivedInvoices: any[] = []
 
   constructor(
     private invoiceApi: InvoiceApiService,
@@ -53,10 +58,17 @@ export class InvoicesComponent implements OnInit {
   addLineItem(): void { this.lineItems.push(this.newLineItem()); }
   removeLineItem(i: number): void { if (this.lineItems.length > 1) this.lineItems.removeAt(i); }
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void { this.load(); 
+    this.loadReceived();
+  }
 
   load(): void {
     this.invoiceApi.getAll().subscribe(res => this.invoices = res.data?.content || []);
+  }
+  loadReceived(): void {
+    this.invoiceApi.getReceived().subscribe(res => {
+      this.receivedInvoices = res.data?.content || [];
+    });
   }
 
   createInvoice(): void {

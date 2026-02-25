@@ -87,6 +87,15 @@ export class InvoiceApiService {
   }
   markAsPaid(id: number): Observable<any> { return this.http.post<any>(`${this.apiUrl}/${id}/mark-paid`, {}); }
   send(id: number): Observable<any> { return this.http.post<any>(`${this.apiUrl}/${id}/send`, {}); }
+  getReceived(page=0, size=20): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/received`,{
+      params: { page, size }
+    });
+  }
+  payInvoice(id: number, paymentDetails?: any): Observable<any> {
+  // If your backend uses the mark-paid endpoint for the actual transfer:
+  return this.http.post<any>(`${this.apiUrl}/${id}/mark-paid`, paymentDetails || {});
+}
 }
 
 @Injectable({ providedIn: 'root' })

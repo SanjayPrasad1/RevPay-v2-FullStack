@@ -25,4 +25,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     @Query("SELECT COALESCE(SUM(i.totalAmount), 0) FROM Invoice i WHERE i.businessUser = :user AND i.status IN ('SENT', 'OVERDUE')")
     BigDecimal sumOutstandingInvoices(@Param("user") User user);
+
+    Page<Invoice> findByCustomerEmailOrderByCreatedAtDesc(String cutomerEmail, Pageable pageable);
 }
