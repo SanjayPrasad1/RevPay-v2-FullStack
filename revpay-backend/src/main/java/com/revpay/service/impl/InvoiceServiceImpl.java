@@ -2,16 +2,12 @@ package com.revpay.service.impl;
 
 import com.revpay.dto.request.InvoiceRequest;
 import com.revpay.dto.response.InvoiceResponse;
-import com.revpay.entity.Invoice;
-import com.revpay.entity.InvoiceLineItem;
-import com.revpay.entity.Notification;
-import com.revpay.entity.User;
-import com.revpay.enums.AccountType;
-import com.revpay.enums.InvoiceStatus;
-import com.revpay.enums.NotificationType;
+import com.revpay.entity.*;
+import com.revpay.enums.*;
 import com.revpay.exception.BadRequestException;
 import com.revpay.repository.InvoiceRepository;
 import com.revpay.repository.NotificationRepository;
+import com.revpay.repository.TransactionRepository;
 import com.revpay.repository.UserRepository;
 import com.revpay.service.InvoiceService;
 import com.revpay.service.NotificationService;
@@ -34,6 +30,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     @Transactional
@@ -121,14 +118,58 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public InvoiceResponse markAsPaid(Long userId, Long invoiceId) {
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-            .orElseThrow(() -> new BadRequestException("Invoice not found"));
-        if (!invoice.getBusinessUser().getId().equals(userId)) {
-            throw new BadRequestException("Access denied");
+        Invoice inv = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new BadRequestException("Invoice not found"));
+
+        User customer = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        if (inv.getStatus() == InvoiceStatus.PAID) {
+            throw new BadRequestException("Invoice is already paid");
         }
-        invoice.setStatus(InvoiceStatus.PAID);
-        invoice.setPaidAt(LocalDateTime.now());
-        return mapToResponse(invoiceRepository.save(invoice));
+
+        //transaction history record
+        Transaction transaction = new Transaction();
+        transaction.setTransactionId("INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        transaction.setSender(customer);
+        transaction.setReceiver(inv.getBusinessUser());
+        transaction.setAmount(inv.getTotalAmount());
+        transaction.setType(TransactionType.INVOICE_PAYMENT);
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setDescription("Payment for Invoice #" + inv.getInvoiceNumber());
+        transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setCompletedAt(LocalDateTime.now());
+
+        transactionRepository.save(transaction);
+
+        // 1. Check & Deduct Balance
+        if (customer.getWalletBalance().compareTo(inv.getTotalAmount()) < 0) {
+            throw new BadRequestException("Insufficient wallet balance");
+        }
+        customer.setWalletBalance(customer.getWalletBalance().subtract(inv.getTotalAmount()));
+
+        // 2. Credit Business Balance
+        User business = inv.getBusinessUser();
+        business.setWalletBalance(business.getWalletBalance().add(inv.getTotalAmount()));
+
+        // 3. Update Status
+        inv.setStatus(InvoiceStatus.PAID);
+        inv.setPaidAt(LocalDateTime.now());
+
+        userRepository.save(customer);
+        userRepository.save(business);
+        invoiceRepository.save(inv);
+
+        // 4. Notify Business
+        notificationService.createNotification(
+                business,
+                "Invoice Paid",
+                "Invoice #" + inv.getInvoiceNumber() + " has been paid by " + customer.getFullName(),
+                NotificationType.PAYMENT_RECEIVED,
+                inv.getId().toString()
+        );
+
+        return mapToResponse(inv);
     }
 
     @Override

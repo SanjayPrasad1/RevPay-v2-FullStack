@@ -7,5 +7,6 @@ public enum NotificationType {
     LOW_BALANCE,
     INVOICE,
     LOAN,
-    GENERAL
+    GENERAL,
+    PAYMENT_RECEIVED
 }
